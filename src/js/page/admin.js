@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from 'react-dom';
 
-import { ResidentListing, ResidentAttendanceRecord, ResidentEnrollmentTable } from "../component/residents"
-import { ProgramListing, ProgramAttendanceRecord } from "../component/programs"
+import { ResidentListing, ResidentAttendanceRecord, ResidentEnrollmentTable, NewResidentForm } from "../component/residents"
+import { ProgramListing, ProgramAttendanceRecord, NewProgramForm } from "../component/programs"
 import { WelbiAPI } from "../api/welbi/api"
 
 import "../../css/admin.css"
@@ -97,6 +97,33 @@ const showListing = (name) => {
 
         default:
             console.error(`Unrecognized listing type ${name}`);
+    }
+
+    showNewForm(name)
+}
+
+/**
+ * Display a form for creating a new entry
+ * @param {string} name : Type of entry to show creation form
+ */
+const showNewForm = (name) => {
+    switch (name) {
+        case "residents":
+            ReactDOM.render(
+                <NewResidentForm />,
+                document.getElementById("newEntry")
+            );
+            break;
+        case "programs":
+            ReactDOM.render(
+                <NewProgramForm />,
+                document.getElementById("newEntry")
+            );
+            setEmptyMessages();
+            break;
+
+        default:
+            console.error(`Unrecognized new record form type ${name}`);
     }
 }
 

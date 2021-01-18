@@ -694,6 +694,38 @@ const SamplePrograms = [
             "Pub Games"
         ],
         "isRepeated": false
+    },
+    {
+        "name": "React Programming",
+        "location": "Computer",
+        "allDay": false,
+        "start": {
+            "@ts": "2021-01-17T19:00:00Z"
+        },
+        "end": {
+            "@ts": "2021-01-17T20:00:00Z"
+        },
+        "tags": [
+            "smart",
+            "react",
+            "joboffer"
+        ],
+        "attendance": [],
+        "dimension": "Intellectual",
+        "facilitators": [
+            "Rec Aide"
+        ],
+        "levelOfCare": [
+            "INDEPENDENT",
+            "ASSISTED"
+        ],
+        "hobbies": [
+            "Computer",
+            "Learning"
+        ],
+        "isRepeated": false,
+        "id": "288018872122999304",
+        "author": "32f31617-ee26-4948-b1e6-ac32756e09cc"
     }
 ];
 

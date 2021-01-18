@@ -2,6 +2,8 @@ import Config from "./config"
 import SamplePrograms from "../../../data/programs"
 import SampleResidents from "../../../data/residents"
 
+const testMode = false;
+
 export const WelbiAPI = {
     // Config information can be included here, but for security reasons should not be, and should not be made a class
 
@@ -10,10 +12,12 @@ export const WelbiAPI = {
      * @return {Array<Object>} : Home residents 
      */
     getResidents: async () => {
-        //return SampleResidents;
+        if (testMode) return SampleResidents;
+
         return fetch(`${Config.proxy}/${Config.baseURL}/residents?token=${Config.token}`,)
             .then(
                 response => {
+                    if (!response.ok) throw `Non 200 resonse(${response.status})`;
                     return response.json();
                 }
             ).catch((error) => {
@@ -27,10 +31,11 @@ export const WelbiAPI = {
      * @return {Array<Object>} : Recreation programs 
      */
     getPrograms: async () => {
-        //return SamplePrograms;
+        if (testMode) return SamplePrograms;
         return fetch(`${Config.proxy}/${Config.baseURL}/programs?token=${Config.token}`,)
             .then(
                 response => {
+                    if (!response.ok) throw `Non 200 resonse(${response.status})`;
                     return response.json();
                 }
             ).catch((error) => {
@@ -56,10 +61,61 @@ export const WelbiAPI = {
             }
         ).then(
             response => {
+                if (!response.ok) throw `Non 200 resonse(${response.status})`;
                 return response.json();
             }
         ).catch((error) => {
             console.error(`Error enrolling resident ${residentID} in program ${programID} Welbi API : ${error}`);
+            return;
+        });
+    },
+
+    /**
+     * Creates a new program
+     * @param {Object} program: Program to create
+     */
+    createProgram: async (program) => {
+        return fetch(
+            `${Config.proxy}/${Config.baseURL}/programs?token=${Config.token}`,
+            {
+                method: "post",
+                body: JSON.stringify(program),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        ).then(
+            response => {
+                if (!response.ok) throw `Non 200 resonse(${response.status})`;
+                return response.json();
+            }
+        ).catch((error) => {
+            console.error(`Error creating program via Welbi API : ${error}`);
+            return;
+        });
+    },
+
+    /**
+     * Creates a new resident
+     * @param {Object} program: Program to create
+     */
+    createResident: async (resident) => {
+        return fetch(
+            `${Config.proxy}/${Config.baseURL}/residents?token=${Config.token}`,
+            {
+                method: "post",
+                body: JSON.stringify(resident),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        ).then(
+            response => {
+                if (!response.ok) throw `Non 200 resonse(${response.status})`;
+                return response.json();
+            }
+        ).catch((error) => {
+            console.error(`Error creating resident via Welbi API : ${error}`);
             return;
         });
     }
