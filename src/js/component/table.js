@@ -1,26 +1,26 @@
 import React from "react";
 
 /**
- * A simple table component
- * @param {Array<string>} headers : Column headers
- * @param {Array<Array<string>>} rows : Row and column information
+ * Generic, customizable table component
+ * @param {Array<string>} props.headers : Column headers
+ * @param {Array<Array<string>>} props.rows : Row and cell information
  */
 export const Table = (headers, rows) => {
     return (
-        <div height="50px" overflow="scroll" >
+        <div >
             <table>
                 <thead>
                     <tr>
-                        {headers.map((header) => { return (<th>{header}</th>) })}
+                        {Object.values(headers).map((header) => { return (<th>{header}</th>) })}
                     </tr>
                 </thead>
                 <tbody>
                     {
                         rows.map((row) => {
                             return (
-                                < tr onClick={row.onClick} title="asdsad" >
+                                < tr onClick={row.onClick} key={row.key} >
                                     {
-                                        row.values.map((cell) => { return <td>{String(cell)}</td> })
+                                        Object.values(row.values).map((cell) => { return <td>{String(cell)}</td> })
                                     }
                                 </tr>
                             )
