@@ -1,4 +1,4 @@
-import { Table } from "../component/table"
+import { Table, ErrorTable } from "../component/table"
 import { formatDataField } from "../../data/format"
 import { WelbiAPI } from "../api/welbi/api"
 import React from "react"
@@ -16,46 +16,49 @@ export class ResidentListing extends React.Component {
         this.state = {
             residents: [],
             headers: props.headers,
-            rowFunction: props.rowFunction
+            rowFunction: props.rowFunction,
+            error: false,
         }
     }
 
     componentDidMount() {
-        WelbiAPI.getResidents().then(residents => this.setState({
-            residents: residents,
-            headers: this.state.headers,
-            rowFunction: this.state.rowFunction
-        }));
+        WelbiAPI.getResidents().then(residents => {
+            this.setState({
+                residents: residents || [],
+                headers: this.state.headers,
+                rowFunction: this.state.rowFunction || null,
+                error: residents ? false : true
+            });
+        })
     }
 
     render() {
-        if (this.state.residents.length === 0) {
-            return Table([], [])
-        } else {
-            let headers = this.state.headers;
-            if (!headers) {
-                headers = [];
-                Object.keys(this.state.residents[0]).forEach((key) => {
-                    // Attendance is reflected in a seperate table
-                    if (key === "attendance") return;
-                    headers.push(key)
-                });
-            }
+        if (this.state.error) return ErrorTable();
+        if (this.state.residents.length === 0) return Table([], [])
 
-            const rows = [];
-            this.state.residents.forEach((resident) => {
-                const rowValues = [];
-                for (let key of headers) {
-                    rowValues.push(formatDataField(resident[key]));
-                };
-                rows.push({
-                    values: rowValues,
-                    onClick: () => this.state.rowFunction(resident.id),
-                    key: `resident${resident.id}`
-                });
+        let headers = this.state.headers;
+        if (!headers) {
+            headers = [];
+            Object.keys(this.state.residents[0]).forEach((key) => {
+                // Attendance is reflected in a seperate table
+                if (key === "attendance") return;
+                headers.push(key)
             });
-            return Table(headers, rows);
         }
+
+        const rows = [];
+        this.state.residents.forEach((resident) => {
+            const rowValues = [];
+            for (let key of headers) {
+                rowValues.push(formatDataField(resident[key]));
+            };
+            rows.push({
+                values: rowValues,
+                onClick: () => this.state.rowFunction(resident.id),
+                key: `resident${resident.id}`
+            });
+        });
+        return Table(headers, rows);
     }
 }
 
@@ -69,21 +72,24 @@ export class ResidentAttendanceRecord extends React.Component {
         super(props);
         this.state = {
             id: props.id,
-            programs: []
+            programs: [],
+            error: false,
         }
     }
 
     componentDidMount() {
-        WelbiAPI.getPrograms().then(programs => this.setState({
-            programs: programs,
-            id: this.state.id
-        }));
+        WelbiAPI.getPrograms().then(programs => {
+            this.setState({
+                programs: programs || [],
+                id: this.state.id,
+                error: programs ? false : true
+            });
+        });
     }
 
     render() {
-        if (this.state.programs.length === 0) {
-            return Table([], []);
-        }
+        if (this.state.programs.length === 0) return Table([], []);
+        if (this.state.error) return ErrorTable();
 
         const headers = ["name", "location", "start", "end", "facilitators"];
         const rows = [];
@@ -123,22 +129,25 @@ export class ResidentEnrollmentTable extends React.Component {
         this.state = {
             programs: [],
             id: props.id,
-            enrollmentFunction: props.enrollmentFunction
+            enrollmentFunction: props.enrollmentFunction,
+            error: false,
         }
     }
 
     async componentDidMount() {
-        WelbiAPI.getPrograms().then(programs => this.setState({
-            programs: programs,
-            id: this.state.id,
-            enrollmentFunction: this.state.enrollmentFunction
-        }));
+        WelbiAPI.getPrograms().then(programs => {
+            this.setState({
+                programs: programs || [],
+                id: this.state.id,
+                enrollmentFunction: this.state.enrollmentFunction,
+                error: programs ? false : true
+            })
+        });
     }
 
     render() {
-        if (this.state.programs.length === 0) {
-            return Table([], []);
-        }
+        if (this.state.error) return ErrorTable();
+        if (this.state.programs.length === 0) return Table([], []);
 
         const headers = ["id", "name", "location"];
         const rows = [];

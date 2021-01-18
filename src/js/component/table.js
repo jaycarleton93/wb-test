@@ -3,7 +3,7 @@ import React from "react";
 /**
  * Generic, customizable table component
  * @param {Array<string>} props.headers : Column headers
- * @param {Array<Array<string>>} props.rows : Row and cell information
+ * @param {Array<Array<Object>>} props.rows : Row and cell information
  */
 export const Table = (headers, rows) => {
     return (
@@ -30,4 +30,9 @@ export const Table = (headers, rows) => {
             </table>
         </div >
     )
+}
+
+// Represents a table that should be displaying data, but is unable to due to an error
+export const ErrorTable = () => {
+    return Table(["Error"], [{ values: ["Temporarily unable to retrieve data, please try again later"] }])
 }

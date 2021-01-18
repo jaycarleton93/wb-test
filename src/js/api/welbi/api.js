@@ -11,15 +11,6 @@ export const WelbiAPI = {
      */
     getResidents: async () => {
         //return SampleResidents;
-
-        try {
-            throw "ERROR";
-
-        } catch (err) {
-            return ["Bad"];
-        }
-
-
         return fetch(`${Config.proxy}/${Config.baseURL}/residents?token=${Config.token}`,)
             .then(
                 response => {
@@ -27,6 +18,7 @@ export const WelbiAPI = {
                 }
             ).catch((error) => {
                 console.error(`Error retrieving residents via Welbi API : ${error}`)
+                return;
             });
     },
 
@@ -35,8 +27,6 @@ export const WelbiAPI = {
      * @return {Array<Object>} : Recreation programs 
      */
     getPrograms: async () => {
-        throw "ERROR";
-
         //return SamplePrograms;
         return fetch(`${Config.proxy}/${Config.baseURL}/programs?token=${Config.token}`,)
             .then(
@@ -44,7 +34,8 @@ export const WelbiAPI = {
                     return response.json();
                 }
             ).catch((error) => {
-                console.error(`Error retrieving programs via Welbi API : ${error}`)
+                console.error(`Error retrieving programs via Welbi API : ${error}`);
+                return;
             });
     },
 
@@ -54,20 +45,22 @@ export const WelbiAPI = {
      * @param {string} residentID : Resident to enroll
      */
     enrollResidentInProgram: async (programID, residentID) => {
-        throw "ERROR";
-
         return fetch(
             `${Config.proxy}/${Config.baseURL}/programs/${programID}/attend?token=${Config.token}`,
             {
                 method: "post",
-                body: JSON.stringify({ residentID: residentID, status: "Active" })
+                body: JSON.stringify({ residentId: residentID, status: "Active" }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
             }
         ).then(
             response => {
                 return response.json();
             }
         ).catch((error) => {
-            console.error(`Error enrolling resident ${residentID} in program ${programID} Welbi API : ${error}`)
+            console.error(`Error enrolling resident ${residentID} in program ${programID} Welbi API : ${error}`);
+            return;
         });
     }
 }

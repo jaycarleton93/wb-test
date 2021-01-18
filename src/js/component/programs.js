@@ -1,4 +1,4 @@
-import { Table } from "./table"
+import { Table, ErrorTable } from "./table"
 import { formatDataField } from "../../data/format"
 import { WelbiAPI } from "../api/welbi/api"
 import React from "react"
@@ -15,22 +15,25 @@ export class ProgramListing extends React.Component {
         this.state = {
             programs: [],
             headers: props.headers,
-            rowFunction: props.rowFunction
+            rowFunction: props.rowFunction,
+            error: false,
         }
     }
 
     componentDidMount() {
-        WelbiAPI.getPrograms().then(programs => this.setState({
-            programs: programs,
-            fields: this.state.fields,
-            rowFunction: this.state.rowFunction
-        }));
+        WelbiAPI.getPrograms().then(programs => {
+            this.setState({
+                programs: programs || [],
+                fields: this.state.fields,
+                rowFunction: this.state.rowFunction,
+                error: programs ? false : true
+            });
+        });
     }
 
     render() {
-        if (this.state.programs.length === 0) {
-            return Table([], [])
-        }
+        if (this.state.error) return ErrorTable();
+        if (this.state.programs.length === 0) return Table([], []);
 
         let headers = this.state.headers;
         if (!headers) {
@@ -70,27 +73,32 @@ export class ProgramAttendanceRecord extends React.Component {
             id: props.id,
             programs: [],
             residents: [],
+            error: false,
         }
     }
 
     componentDidMount() {
-        WelbiAPI.getPrograms().then(programs => this.setState({
-            programs: programs,
-            id: this.state.id,
-            residents: this.state.residents
-        }));
-        WelbiAPI.getResidents().then(residents => this.setState({
-            programs: this.state.programs,
-            id: this.state.id,
-            residents: residents
-        }));
+        WelbiAPI.getPrograms().then(programs => {
+            this.setState({
+                programs: programs || [],
+                id: this.state.id,
+                residents: this.state.residents,
+                error: programs ? false : true,
+            });
+        });
+        WelbiAPI.getResidents().then(residents => {
+            this.setState({
+                programs: this.state.programs,
+                id: this.state.id,
+                residents: residents || [],
+                error: residents ? false : true
+            });
+        });
     }
 
     render() {
-
-        if (this.state.programs.length === 0) {
-            return Table([], []);
-        }
+        if (this.state.error) return ErrorTable();
+        if (this.state.programs.length === 0) return Table([], []);
 
         const headers = ["id", "name", "preferredName", "status", "room", "birthDate"];
         const rows = [];

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import { ResidentListing, ResidentAttendanceRecord, ResidentEnrollmentTable } from "../component/residents"
 import { ProgramListing, ProgramAttendanceRecord } from "../component/programs"
-// import { WelbiAPI } from "./api/welbi/api"
+import { WelbiAPI } from "../api/welbi/api"
 
 import "../../css/admin.css"
 
@@ -23,7 +23,7 @@ const Admin = () => {
  */
 const processResidentAttendance = (id) => {
     ReactDOM.render(
-        <ResidentAttendanceRecord id={id} key={"residentAttendance" + id} />,
+        <ResidentAttendanceRecord id={id} key={`residentAttendance${id}/${currentTS()}`} />,
         document.getElementById("attendanceTable")
     );
     // As soon as we have processed which programs the resident currently attends, we can also display the ones they do not
@@ -36,7 +36,7 @@ const processResidentAttendance = (id) => {
  */
 const processResidentEnrollmentOptions = (id) => {
     ReactDOM.render(
-        <ResidentEnrollmentTable id={id} enrollmentFunction={enrollResidentInProgram} key={"residentEnrollment" + id} />,
+        <ResidentEnrollmentTable id={id} enrollmentFunction={enrollResidentInProgram} key={`residentEnrollment${id}/${currentTS()}`} />,
         document.getElementById("enrollmentTable")
     );
 }
@@ -47,7 +47,7 @@ const processResidentEnrollmentOptions = (id) => {
  */
 const processProgramAttendance = (id) => {
     ReactDOM.render(
-        <ProgramAttendanceRecord id={id} key={"programAttendance" + id} />,
+        <ProgramAttendanceRecord id={id} key={`programAttendance${id}/${currentTS()}`} />,
         document.getElementById("attendanceTable")
     );
 }
@@ -59,10 +59,18 @@ const processProgramAttendance = (id) => {
  */
 const enrollResidentInProgram = (residentID, programID) => {
     if (window.confirm(`Are you sure you want to enrol resident ${residentID} in program ${programID}?`)) {
-        alert("Enrolled.");
-        processResidentAttendance(residentID);
+        WelbiAPI.enrollResidentInProgram(programID, residentID).then(
+            (enrollment) => {
+                if (!enrollment) {
+                    alert("Unable to enrol resident in program, please try again later");
+                } else {
+                    // Refresh the dependant tables
+                    processResidentAttendance(residentID);
+                }
+            }
+        )
     } else {
-        alert("Aborted");
+        alert("Aborted enrollment");
     }
 }
 
@@ -74,14 +82,14 @@ const showListing = (name) => {
     switch (name) {
         case "residents":
             ReactDOM.render(
-                <ResidentListing fields={null} rowFunction={processResidentAttendance} key="residentsListing" />,
+                <ResidentListing fields={null} rowFunction={processResidentAttendance} key={`residentsListing/${currentTS()}`} />,
                 document.getElementById("listingTable")
             );
             setEmptyMessages();
             break;
         case "programs":
             ReactDOM.render(
-                <ProgramListing fields={null} rowFunction={processProgramAttendance} key="programsListing" />,
+                <ProgramListing fields={null} rowFunction={processProgramAttendance} key={`programsListing/${currentTS()}`} />,
                 document.getElementById("listingTable")
             );
             setEmptyMessages();
@@ -91,6 +99,11 @@ const showListing = (name) => {
             console.error(`Unrecognized listing type ${name}`);
     }
 }
+
+/**
+ * Retrieves the current unix timestamp
+ */
+const currentTS = () => { return + new Date() }
 
 /**
  * Renders messages for empty content
